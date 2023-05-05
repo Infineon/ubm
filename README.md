@@ -2,10 +2,10 @@
 
 ## Overview
 
-The the implementation of the UBM middleware for ModusToolbox&trade; is currently 
-at the Preliminary level. Features may change without notice.
-Contact <a href="https:/\/www.infineon.com/cms/en/about-infineon/company/contacts/support/">
-<b>Infineon Product Support</b></a> for additional details.
+The implementation of the UBM middleware for ModusToolbox&trade; is currently 
+at the Preliminary level. The features may change without notice.
+For details contact <a href="https:/\/www.infineon.com/cms/en/about-infineon/company/contacts/support/">
+<b>Infineon Product Support</b></a>.
 
 The UBM middleware provides the implementation of the Universal Backplane Management (UBM) - a common backplane management framework
 for a host to determine SAS/SATA/PCIe backplane capabilities, Drive Facing Connector (DFC) Status and Control information, and to read
@@ -15,7 +15,7 @@ the port routing of the Drive Facing Connectors to Host Facing Connectors (HFC) 
 
  - Status and Control over Drive Facing Connector I/O
  - High speed lane port routing assignments to Host Facing Connectors
- - Backplane capabilities including:
+ - Backplane capabilities:
      - PCIe Reference Clock expectations
      - PCIe Reset expectations
      - Power Disable support
