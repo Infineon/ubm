@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * \file mtb_ubm_ifc.c
- * \version 0.5
+ * \version 1.0
  *
  * \brief
- * Provides the UBM middleware interfaces functions.
+ * Provides functions for the UBM middleware interfaces.
  *
  *******************************************************************************
  * (c) (2021-2023), Cypress Semiconductor Corporation (an Infineon company) or
@@ -45,27 +45,90 @@
 #include "mtb_ubm_controller.h"
 #include <string.h>
 
-CY_MISRA_DEVIATE_BLOCK_START('MISRA C-2012 Rule 10.1', 6, \
-'Checked manually. Intentional expressions of type enum are used as an operand to the arithmetic operator "&".');
 
-CY_MISRA_DEVIATE_BLOCK_START('MISRA C-2012 Rule 10.4', 1, \
-'Checked manually. Intentional arithmetic conversion on enum type.');
+/** Read the FRU transaction packet length. */
+#define FRU_READ_TRANSACTION_LEN            (1U)
 
-CY_MISRA_DEVIATE_BLOCK_START('MISRA C-2012 Rule 10.5', 1, \
-'Checked manually. Intentional type cast to an enum type.');
+/** Read the Command transaction packet length. */
+#define CMD_READ_TRANSACTION_LEN            (2U)
+
+/** Read the PMDT Command transaction packet length. */
+#define PMDT_READ_TRANSACTION_LEN           (4U)
+
+/** Invalid data for the read buffer. */
+#define INVALID_DATA                        (0xFF)
+
+/** Invalid controller index. */
+#define INVALID_CTRL_INDEX                  (0xFFU)
 
 
-/** Read FRU transaction packet length. */
-#define FRU_READ_TRANSACTION_LEN    (1U)
+#define SCD_SES_BYTE0                       (0U)
+#define SCD_SES_BYTE1                       (1U)
+#define SCD_SES_BYTE2                       (2U)
+#define SCD_SES_BYTE3                       (3U)
+#define SCD_CMD_SAS_ELEM_STS_CODE_Pos       (0U)
+#define SCD_CMD_SAS_ELEM_STS_CODE_Msk       (0x0FU)
+#define SCD_CMD_SAS_RESET_SWAP_Pos          (4U)
+#define SCD_CMD_SAS_RESET_SWAP_Msk          (0x10U)
+#define SCD_CMD_SAS_DISABLE_Pos             (5U)
+#define SCD_CMD_SAS_DISABLE_Msk             (0x20U)
+#define SCD_CMD_SAS_PRDFAIL_Pos             (6U)
+#define SCD_CMD_SAS_PRDFAIL_Msk             (0x40U)
+#define SCD_CMD_SAS_SELECT_Pos              (7U)
+#define SCD_CMD_SAS_SELECT_Msk              (0x80U)
+#define SCD_CMD_SAS_RR_ABORT_Pos            (0U)
+#define SCD_CMD_SAS_RR_ABORT_Msk            (0x01U)
+#define SCD_CMD_SAS_RR_Pos                  (1U)
+#define SCD_CMD_SAS_RR_Msk                  (0x02U)
+#define SCD_CMD_SAS_IN_FAILED_ARRAY_Pos     (2U)
+#define SCD_CMD_SAS_IN_FAILED_ARRAY_Msk     (0x04U)
+#define SCD_CMD_SAS_IN_CRIT_ARRAY_Pos       (3U)
+#define SCD_CMD_SAS_IN_CRIT_ARRAY_Msk       (0x08U)
+#define SCD_CMD_SAS_CONS_CHECK_Pos          (4U)
+#define SCD_CMD_SAS_CONS_CHECK_Msk          (0x10U)
+#define SCD_CMD_SAS_HOT_SPARE_Pos           (5U)
+#define SCD_CMD_SAS_HOT_SPARE_Msk           (0x20U)
+#define SCD_CMD_SAS_RSVD_DEVICE_Pos         (6U)
+#define SCD_CMD_SAS_RSVD_DEVICE_Msk         (0x40U)
+#define SCD_CMD_SAS_OK_Pos                  (7U)
+#define SCD_CMD_SAS_OK_Msk                  (0x80U)
+#define SCD_CMD_SAS_REPORT_Pos              (0U)
+#define SCD_CMD_SAS_REPORT_Msk              (0x01U)
+#define SCD_CMD_SAS_IDENT_Pos               (1U)
+#define SCD_CMD_SAS_IDENT_Msk               (0x02U)
+#define SCD_CMD_SAS_REMOVE_Pos              (2U)
+#define SCD_CMD_SAS_REMOVE_Msk              (0x04U)
+#define SCD_CMD_SAS_INSERT_Pos              (3U)
+#define SCD_CMD_SAS_INSERT_Msk              (0x08U)
+#define SCD_CMD_SAS_MISSING_Pos             (4U)
+#define SCD_CMD_SAS_MISSING_Msk             (0x10U)
+#define SCD_CMD_SAS_ENCL_BYP_B_Pos          (4U)
+#define SCD_CMD_SAS_ENCL_BYP_B_Msk          (0x10U)
+#define SCD_CMD_SAS_ENCL_BYP_A_Pos          (5U)
+#define SCD_CMD_SAS_ENCL_BYP_A_Msk          (0x20U)
+#define SCD_CMD_SAS_DO_NOT_REMOVE_Pos       (6U)
+#define SCD_CMD_SAS_DO_NOT_REMOVE_Msk       (0x40U)
+#define SCD_CMD_SAS_ACTIVE_Pos              (7U)
+#define SCD_CMD_SAS_ACTIVE_Msk              (0x80U)
+#define SCD_CMD_SAS_APP_BYP_A_Pos           (7U)
+#define SCD_CMD_SAS_APP_BYP_A_Msk           (0x80U)
+#define SCD_CMD_SAS_DEV_BYP_B_Pos           (0U)
+#define SCD_CMD_SAS_DEV_BYP_B_Msk           (0x01U)
+#define SCD_CMD_SAS_DEV_BYP_A_Pos           (1U)
+#define SCD_CMD_SAS_DEV_BYP_A_Msk           (0x02U)
+#define SCD_CMD_SAS_BYP_B_Pos               (2U)
+#define SCD_CMD_SAS_BYP_B_Msk               (0x04U)
+#define SCD_CMD_SAS_BYP_A_Pos               (3U)
+#define SCD_CMD_SAS_BYP_A_Msk               (0x08U)
+#define SCD_CMD_SAS_DEVICE_OFF_Pos          (4U)
+#define SCD_CMD_SAS_DEVICE_OFF_Msk          (0x10U)
+#define SCD_CMD_SAS_FAULT_REQUEST_Pos       (5U)
+#define SCD_CMD_SAS_FAULT_REQUEST_Msk       (0x20U)
+#define SCD_CMD_SAS_FAULT_SENSED_Pos        (6U)
+#define SCD_CMD_SAS_FAULT_SENSED_Msk        (0x40U)
+#define SCD_CMD_SAS_APP_BYP_B_Pos           (7U)
+#define SCD_CMD_SAS_APP_BYP_B_Msk           (0x80U)
 
-/** Read Command transaction packet length. */
-#define CMD_READ_TRANSACTION_LEN    (2U)
-
-/** Read PMDT Command transaction packet length. */
-#define PMDT_READ_TRANSACTION_LEN   (4U)
-
-/** Invalid data for read buffer. */
-#define INVALID_DATA                (0xFF)
 
 
 /*******************************************************************************
@@ -75,45 +138,42 @@ static cyhal_i2c_command_rsp_t handle_i2c_address(void* callback_arg,
                                                   cyhal_i2c_addr_event_t event,
                                                   uint8_t address);
 static void handle_i2c_event(void* callback_arg, cyhal_i2c_event_t event);
-static cy_rslt_t configure_write_buffer(mtb_stc_ubm_controller_t* ctrl_context);
-static cy_rslt_t configure_read_buffer(mtb_stc_ubm_controller_t* ctrl_context);
+static cy_rslt_t configure_write_buffer(mtb_stc_ubm_hfc_t* hfc_context);
+static cy_rslt_t configure_read_buffer(mtb_stc_ubm_hfc_t* hfc_context);
 
 
 /*******************************************************************************
-* Function Name: mtb_ubm_i2c_init
+* Function Name: mtb_ubm_ifc_i2c_init
 ****************************************************************************//**
 *
 *  The function initializes the UBM middleware I2C instance specified
 *  by the arguments.
 *
 * \param ubm_context
-*  Pointer to the UBM context structure.
+*  The pointer to the UBM context structure.
 *
-* \param ctrl_context
-*  Pointer to the UBM controller context structure.
-*
-* \param ubm_backplane_config
-*  Pointer to backplane configuration structure.
+* \param hfc_index
+*  The index of the UBM controller context structure.
 *
 * \param ubm_backplane_control_signals
-*  Pointer to backplane control signals configuration structure.
+*  The pointer to the configuration structure of backplane control signals.
 *
 * \return
-*  "false" if initialization succeeds, and "true" if it fails.
+*  See \ref mtb_en_ubm_status_t.
 *
 *******************************************************************************/
-bool mtb_ubm_i2c_init(mtb_stc_ubm_context_t* ubm_context,
-                      mtb_stc_ubm_controller_t* ctrl_context,
-                      const mtb_stc_ubm_backplane_cfg_t* ubm_backplane_config,
-                      const mtb_stc_ubm_backplane_control_signals_t* ubm_backplane_control_signals)
+mtb_en_ubm_status_t mtb_ubm_ifc_i2c_init(mtb_stc_ubm_context_t* ubm_context,
+                                         uint32_t hfc_index,
+                                         const mtb_stc_ubm_backplane_control_signals_t* ubm_backplane_control_signals)
 {
     cy_rslt_t result;
-    bool status;
+    mtb_en_ubm_status_t status;
+    mtb_stc_ubm_hfc_t* hfc_context = &ubm_context->hfc[hfc_index];
 
-    /* Initialize I2C slave resources */
-    result = cyhal_i2c_init(&ctrl_context->i2c.scb_i2c_obj,
-                            ubm_backplane_control_signals->hfc_io[ctrl_context->index].sda,
-                            ubm_backplane_control_signals->hfc_io[ctrl_context->index].scl,
+    /* Initialize the I2C slave resources */
+    result = cyhal_i2c_init(&hfc_context->i2c.scb_i2c_obj,
+                            ubm_backplane_control_signals->hfc_io[hfc_context->index].sda,
+                            ubm_backplane_control_signals->hfc_io[hfc_context->index].scl,
                             NULL);
 
     if (CY_RSLT_SUCCESS == result)
@@ -125,62 +185,59 @@ bool mtb_ubm_i2c_init(mtb_stc_ubm_context_t* ubm_context,
             true
         };
 
-        /* Configure I2C slave */
-        result = cyhal_i2c_configure_adv(&ctrl_context->i2c.scb_i2c_obj,
+        /* Configure the I2C slave */
+        result = cyhal_i2c_configure_adv(&hfc_context->i2c.scb_i2c_obj,
                                          &i2c_slave_config);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        /* Configure buffer to which master writes data to */
-        result = configure_write_buffer(ctrl_context);
+        /* Configure the buffer to which the master writes data to */
+        result = configure_write_buffer(hfc_context);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        /* Configure buffer from which master reads data from */
-        result = configure_read_buffer(ctrl_context);
+        /* Configure the buffer from which the master reads data from */
+        result = configure_read_buffer(hfc_context);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        cyhal_i2c_event_t events;
-
         /* Register I2C slave event callback */
-        ctrl_context->i2c.cb_arg.ubm_context = ubm_context;
-        ctrl_context->i2c.cb_arg.ctrl_context = ctrl_context;
-        cyhal_i2c_register_callback(&ctrl_context->i2c.scb_i2c_obj,
+        hfc_context->i2c.cb_arg.ubm_context = ubm_context;
+        hfc_context->i2c.cb_arg.hfc_index = (uint8_t)hfc_index;
+        cyhal_i2c_register_callback(&hfc_context->i2c.scb_i2c_obj,
                                     handle_i2c_event,
-                                    &ctrl_context->i2c.cb_arg);
+                                    &hfc_context->i2c.cb_arg);
 
-        /* Enable I2C events */
-        events = (cyhal_i2c_event_t)(CYHAL_I2C_SLAVE_WR_CMPLT_EVENT | \
-                                     CYHAL_I2C_SLAVE_RD_CMPLT_EVENT | \
-                                     CYHAL_I2C_SLAVE_ERR_EVENT);
-        cyhal_i2c_enable_event(&ctrl_context->i2c.scb_i2c_obj, events,
+        /* Enable the I2C events */
+        cyhal_i2c_enable_event(&hfc_context->i2c.scb_i2c_obj, CYHAL_I2C_SLAVE_WR_CMPLT_EVENT,
                                MTB_UBM_I2C_SLAVE_IRQ_PRIORITY, true);
 
-        /* Register I2C slave address callback */
-        cyhal_i2c_register_address_callback(&ctrl_context->i2c.scb_i2c_obj,
-                                            handle_i2c_address,
-                                            &ctrl_context->i2c.cb_arg);
+        cyhal_i2c_enable_event(&hfc_context->i2c.scb_i2c_obj, CYHAL_I2C_SLAVE_RD_CMPLT_EVENT,
+                               MTB_UBM_I2C_SLAVE_IRQ_PRIORITY, true);
 
-        /* Enable address event */
-        cyhal_i2c_enable_address_event(&ctrl_context->i2c.scb_i2c_obj, CYHAL_I2C_ADDR_MATCH_EVENT,
+        cyhal_i2c_enable_event(&hfc_context->i2c.scb_i2c_obj, CYHAL_I2C_SLAVE_ERR_EVENT,
+                               MTB_UBM_I2C_SLAVE_IRQ_PRIORITY, true);
+
+        /* Register the I2C slave address callback */
+        cyhal_i2c_register_address_callback(&hfc_context->i2c.scb_i2c_obj,
+                                            handle_i2c_address,
+                                            &hfc_context->i2c.cb_arg);
+
+        /* Enable the address event */
+        cyhal_i2c_enable_address_event(&hfc_context->i2c.scb_i2c_obj, CYHAL_I2C_ADDR_MATCH_EVENT,
                                        MTB_UBM_I2C_SLAVE_IRQ_PRIORITY, true);
 
-        /* Save configured controller address */
-        ctrl_context->i2c.controller_address =
-            ubm_backplane_config->hfc_routing[ctrl_context->index].ubm_ctrl_slave_addr;
-
-        status = false;
+        status = MTB_UBM_STATUS_SUCCESS;
     }
     else
     {
         /* Release the allocated resources */
-        cyhal_i2c_free(&ctrl_context->i2c.scb_i2c_obj);
+        cyhal_i2c_free(&hfc_context->i2c.scb_i2c_obj);
 
-        status = true;
+        status = MTB_UBM_STATUS_2WIRE_IO_CONFIG_ERR;
     }
 
     return status;
@@ -191,37 +248,48 @@ bool mtb_ubm_i2c_init(mtb_stc_ubm_context_t* ubm_context,
 * Function Name: handle_i2c_address
 ****************************************************************************//**
 *
-*  Handles I2C address received event.
+*  Handles the I2C address received event.
 *
 * \param callback_arg
-*  Callback argument, pointer to the context structures.
+*  A callback argument, the pointer to the context structures.
 *
 * \param event
-*  Event to be handled.
-* 
+*  The event to be handled.
+*
 * \param address
-*  Received I2C address.
+*  The received I2C address.
 *
 * \return
-*  "CYHAL_I2C_CMD_ACK" if the received address matches one that is configured, and
-*  "CYHAL_I2C_CMD_NAK" otherwise.
+*  "CYHAL_I2C_CMD_ACK" - if the received address matches the configured address,
+*  "CYHAL_I2C_CMD_NAK" - otherwise.
 *
 *******************************************************************************/
 static cyhal_i2c_command_rsp_t handle_i2c_address(void* callback_arg, cyhal_i2c_addr_event_t event, uint8_t address)
 {
     cyhal_i2c_command_rsp_t response = CYHAL_I2C_CMD_NAK;
 
-    /* Check slave address match event */
-    if (0UL != (CYHAL_I2C_ADDR_MATCH_EVENT & event))
+    /* Check the slave address match event */
+    if (0U != ((uint32_t)CYHAL_I2C_ADDR_MATCH_EVENT & (uint32_t)event))
     {
-        mtb_stc_ubm_i2c_callback_arg_t* arg = (mtb_stc_ubm_i2c_callback_arg_t*)callback_arg;
-        mtb_stc_ubm_controller_t* ctrl_context = arg->ctrl_context;
+        CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 11.5', 'Pointer passed via callback_arg is aligned correcly, as contains address of a known object.');
+        const mtb_stc_ubm_i2c_callback_arg_t* arg = (mtb_stc_ubm_i2c_callback_arg_t*)callback_arg;
+        mtb_stc_ubm_context_t* ubm_context = arg->ubm_context;
+        mtb_stc_ubm_hfc_t* hfc_context = &ubm_context->hfc[arg->hfc_index];
 
-        /* Check if received address matches FRU or controller address */
-        if ((MTB_UBM_I2C_SLAVE_FRU_ADDRESS == address) ||
-            (ctrl_context->i2c.controller_address == address))
+        hfc_context->selected_ctrl_index = INVALID_CTRL_INDEX;
+        for (uint32_t ctrl_index = 0U; ctrl_index < hfc_context->ctrl_count; ctrl_index++)
         {
-            ctrl_context->i2c.received_address = address;
+            if ((hfc_context->ctrl_slave_address[ctrl_index] >> 1U) == address)
+            {
+                hfc_context->selected_ctrl_index = (uint8_t)ctrl_index;
+                break;
+            }
+        }
+
+        if ((MTB_UBM_I2C_SLAVE_FRU_ADDRESS == address) ||
+            (INVALID_CTRL_INDEX != hfc_context->selected_ctrl_index))
+        {
+            hfc_context->selected_slave_address = address;
             response = CYHAL_I2C_CMD_ACK;
         }
     }
@@ -237,94 +305,87 @@ static cyhal_i2c_command_rsp_t handle_i2c_address(void* callback_arg, cyhal_i2c_
 *  Handles I2C slave events.
 *
 * \param callback_arg
-*  Callback argument, pointer to the context structures.
+*  A callback argument, the pointer to the context structures.
 *
 * \param event
-*  Event to be handled.
+*  The event to be handled.
 *
 *******************************************************************************/
 static void handle_i2c_event(void* callback_arg, cyhal_i2c_event_t event)
 {
     /* Check for errors */
-    if (0UL == (CYHAL_I2C_SLAVE_ERR_EVENT & event))
+    if (0U == ((uint32_t)CYHAL_I2C_SLAVE_ERR_EVENT & (uint32_t)event))
     {
-        CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 11.5', 'Cast callback_arg parameter is safe, as it was intentional saved previously.');
-        mtb_stc_ubm_i2c_callback_arg_t* arg = (mtb_stc_ubm_i2c_callback_arg_t*)callback_arg;
-        mtb_stc_ubm_controller_t* ctrl_context = arg->ctrl_context;
+        CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 11.5', 'Pointer passed via callback_arg is aligned correcly, as contains address of a known object.');
+        const mtb_stc_ubm_i2c_callback_arg_t* arg = (mtb_stc_ubm_i2c_callback_arg_t*)callback_arg;
+        mtb_stc_ubm_context_t* ubm_context = arg->ubm_context;
+        mtb_stc_ubm_hfc_t* hfc_context = &ubm_context->hfc[arg->hfc_index];
 
-        /* Check write complete event */
-        if (0UL != (CYHAL_I2C_SLAVE_WR_CMPLT_EVENT & event))
+        /* Check the write complete event */
+        if (0U != ((uint32_t)CYHAL_I2C_SLAVE_WR_CMPLT_EVENT & (uint32_t)event))
         {
-            mtb_stc_ubm_context_t* ubm_context = arg->ubm_context;
+            hfc_context->i2c.write_data_length = cyhal_i2c_slave_readable(&hfc_context->i2c.scb_i2c_obj);
 
-            ctrl_context->i2c.write_data_length =
-                Cy_SCB_I2C_SlaveGetWriteTransferCount(ctrl_context->i2c.scb_i2c_obj.base,
-                                                      &ctrl_context->i2c.scb_i2c_obj.context);
-
-            if (MTB_UBM_I2C_SLAVE_FRU_ADDRESS == ctrl_context->i2c.received_address)
+            if (MTB_UBM_I2C_SLAVE_FRU_ADDRESS == hfc_context->selected_slave_address)
             {
-                if (FRU_READ_TRANSACTION_LEN == ctrl_context->i2c.write_data_length)
+                if (FRU_READ_TRANSACTION_LEN == hfc_context->i2c.write_data_length)
                 {
-                    /* FRU read request */
-                    ctrl_context->i2c.read_request = true;
-                    mtb_ubm_fru_handle_request(ubm_context, ctrl_context);
+                    /* The FRU read request */
+                    hfc_context->i2c.read_request = true;
+                    mtb_ubm_fru_handle_request(ubm_context, hfc_context);
 
-                    /* Prepare read buffer for the read transaction */
-                    (void)cyhal_i2c_slave_config_read_buffer(&ctrl_context->i2c.scb_i2c_obj,
-                                                             ctrl_context->i2c.read_buffer,
-                                                             (uint16_t)ctrl_context->i2c.read_data_length);
+                    /* Prepare the read buffer for the read transaction */
+                    (void)cyhal_i2c_slave_config_read_buffer(&hfc_context->i2c.scb_i2c_obj,
+                                                             hfc_context->i2c.read_buffer,
+                                                             (uint16_t)hfc_context->i2c.read_data_length);
                 }
                 else
                 {
                     /* Unsupported request */
                 }
             }
-            else if (ctrl_context->i2c.controller_address == ctrl_context->i2c.received_address)
+            else
             {
-                mtb_ubm_cmd_t cmd = mtb_ubm_get_packet_command(ctrl_context);
+                mtb_ubm_cmd_t cmd = mtb_ubm_get_packet_command(hfc_context);
 
                 if (((MTB_UBM_CMD_PROGRAMMABLE_MODE_DATA_TRANSFER == cmd) &&
-                     (PMDT_READ_TRANSACTION_LEN == ctrl_context->i2c.write_data_length)) ||
+                     (PMDT_READ_TRANSACTION_LEN == hfc_context->i2c.write_data_length)) ||
                     ((MTB_UBM_CMD_PROGRAMMABLE_MODE_DATA_TRANSFER != cmd) &&
-                     (CMD_READ_TRANSACTION_LEN == ctrl_context->i2c.write_data_length)))
+                     (CMD_READ_TRANSACTION_LEN == hfc_context->i2c.write_data_length)))
                 {
                     /* Controller read request */
-                    ctrl_context->i2c.read_request = true;
-                    mtb_ubm_controller_handle_request(ubm_context, ctrl_context);
+                    hfc_context->i2c.read_request = true;
+                    mtb_ubm_controller_handle_request(ubm_context, hfc_context);
 
-                    /* Prepare read buffer for the read transaction */
-                    (void)cyhal_i2c_slave_config_read_buffer(&ctrl_context->i2c.scb_i2c_obj,
-                                                             ctrl_context->i2c.read_buffer,
-                                                             (uint16_t)ctrl_context->i2c.read_data_length);
+                    /* Prepare the read buffer for the read transaction */
+                    (void)cyhal_i2c_slave_config_read_buffer(&hfc_context->i2c.scb_i2c_obj,
+                                                             hfc_context->i2c.read_buffer,
+                                                             (uint16_t)hfc_context->i2c.read_data_length);
                 }
                 else if (((MTB_UBM_CMD_PROGRAMMABLE_MODE_DATA_TRANSFER == cmd) &&
-                          (PMDT_READ_TRANSACTION_LEN < ctrl_context->i2c.write_data_length)) ||
+                          (PMDT_READ_TRANSACTION_LEN < hfc_context->i2c.write_data_length)) ||
                          ((MTB_UBM_CMD_PROGRAMMABLE_MODE_DATA_TRANSFER != cmd) &&
-                          (CMD_READ_TRANSACTION_LEN < ctrl_context->i2c.write_data_length)))
+                          (CMD_READ_TRANSACTION_LEN < hfc_context->i2c.write_data_length)))
                 {
                     /* Controller write request */
-                    ctrl_context->i2c.read_request = false;
-                    mtb_ubm_controller_handle_request(ubm_context, ctrl_context);
+                    hfc_context->i2c.read_request = false;
+                    mtb_ubm_controller_handle_request(ubm_context, hfc_context);
                 }
                 else
                 {
                     /* Unexpected data length */
                 }
             }
-            else
-            {
-                /* Unexpected address */
-            }
 
-            /* Clear and configure write buffer */
-            (void)configure_write_buffer(ctrl_context);
+            /* Clear and configure the write buffer */
+            (void)configure_write_buffer(hfc_context);
         }
 
-        /* Check read complete event */
-        if (0UL != (CYHAL_I2C_SLAVE_RD_CMPLT_EVENT & event))
+        /* Check the read complete event */
+        if (0U != ((uint32_t)CYHAL_I2C_SLAVE_RD_CMPLT_EVENT & (uint32_t)event))
         {
-            /* Clear and configure read buffer */
-            (void)configure_read_buffer(ctrl_context);
+            /* Clear and configure the read buffer */
+            (void)configure_read_buffer(hfc_context);
         }
     }
 }
@@ -334,23 +395,23 @@ static void handle_i2c_event(void* callback_arg, cyhal_i2c_event_t event)
 * Function Name: configure_write_buffer
 ****************************************************************************//**
 *
-*  Configures buffer to which master writes data to.
+*  Configures the buffer to which the master writes data to.
 *
-* \param ctrl_context
-*  Pointer to the UBM controller context structure.
+* \param hfc_context
+*  The pointer to the HFC context structure.
 *
 * \return
-*  Result of the cyhal_i2c_slave_config_write_buffer request
+*  The result of the cyhal_i2c_slave_config_write_buffer request.
 *
 *******************************************************************************/
-static cy_rslt_t configure_write_buffer(mtb_stc_ubm_controller_t* ctrl_context)
+static cy_rslt_t configure_write_buffer(mtb_stc_ubm_hfc_t* hfc_context)
 {
     cy_rslt_t result;
 
-    ctrl_context->i2c.write_data_length = 0U;
-    (void)memset(ctrl_context->i2c.write_buffer, 0, MTB_UBM_I2C_WRITE_BUFFER_SIZE);
-    result = cyhal_i2c_slave_config_write_buffer(&ctrl_context->i2c.scb_i2c_obj,
-                                                 ctrl_context->i2c.write_buffer,
+    hfc_context->i2c.write_data_length = 0U;
+    (void)memset(hfc_context->i2c.write_buffer, 0, MTB_UBM_I2C_WRITE_BUFFER_SIZE);
+    result = cyhal_i2c_slave_config_write_buffer(&hfc_context->i2c.scb_i2c_obj,
+                                                 hfc_context->i2c.write_buffer,
                                                  MTB_UBM_I2C_WRITE_BUFFER_SIZE);
     return result;
 }
@@ -360,29 +421,136 @@ static cy_rslt_t configure_write_buffer(mtb_stc_ubm_controller_t* ctrl_context)
 * Function Name: configure_read_buffer
 ****************************************************************************//**
 *
-*  Configures buffer from which master reads data from.
+*  Configures the buffer from which the master reads data from.
 *
-* \param ctrl_context
-*  Pointer to the UBM controller context structure.
+* \param hfc_context
+*  The pointer to the HFC context structure.
 *
 * \return
-*  Result of the cyhal_i2c_slave_config_read_buffer request
+*  The result of the cyhal_i2c_slave_config_read_buffer request.
 *
 *******************************************************************************/
-static cy_rslt_t configure_read_buffer(mtb_stc_ubm_controller_t* ctrl_context)
+static cy_rslt_t configure_read_buffer(mtb_stc_ubm_hfc_t* hfc_context)
 {
     cy_rslt_t result;
 
-    ctrl_context->i2c.read_data_length = 0U;
-    (void)memset(ctrl_context->i2c.read_buffer, INVALID_DATA, MTB_UBM_I2C_READ_BUFFER_SIZE);
-    result = cyhal_i2c_slave_config_read_buffer(&ctrl_context->i2c.scb_i2c_obj,
-                                                ctrl_context->i2c.read_buffer,
+    hfc_context->i2c.read_data_length = 0U;
+    (void)memset(hfc_context->i2c.read_buffer, INVALID_DATA, MTB_UBM_I2C_READ_BUFFER_SIZE);
+    result = cyhal_i2c_slave_config_read_buffer(&hfc_context->i2c.scb_i2c_obj,
+                                                hfc_context->i2c.read_buffer,
                                                 MTB_UBM_I2C_READ_BUFFER_SIZE);
     return result;
 }
 
 
-CY_MISRA_BLOCK_END('MISRA C-2012 Rule 10.1');
-CY_MISRA_BLOCK_END('MISRA C-2012 Rule 10.4');
-CY_MISRA_BLOCK_END('MISRA C-2012 Rule 10.5');
+#if (MTB_UBM_SES_CB_ACTIVE)
+/*******************************************************************************
+* Function Name: mtb_ubm_ifc_ses_app_event
+****************************************************************************//**
+*
+*  Calls the APP event if the SES register has changed.
+*
+* \param app_callback
+*
+*
+* \param dfc_index
+*  The index of the DFC record changed.
+*
+* \param ses_control_data
+*  The pointer to the received SES Array Device Slot Control Element data.
+*
+* \param ses_status_data
+*  The pointer to the SES Array Device Slot Status Element data.
+*
+*******************************************************************************/
+void mtb_ubm_ifc_ses_app_event(mtb_ubm_ses_app_cb_t app_callback,
+                               uint8_t dfc_index,
+                               const uint8_t* ses_control_data,
+                               uint8_t* ses_status_data)
+{
+    if (NULL != app_callback)
+    {
+        mtb_stc_ubm_ses_app_cb_context_t app_context;
+        mtb_stc_ubm_ses_control_t ses_control;
+        mtb_stc_ubm_ses_status_t ses_status;
+        uint8_t byte;
+        bool result;
 
+        (void)memset(&ses_control, 0, sizeof(mtb_stc_ubm_ses_control_t));
+        (void)memset(&ses_status, 0, sizeof(mtb_stc_ubm_ses_status_t));
+
+        byte = ses_control_data[SCD_SES_BYTE0];
+        ses_control.reset_swap = (0U != (byte & SCD_CMD_SAS_RESET_SWAP_Msk));
+        ses_control.disable = (0U != (byte & SCD_CMD_SAS_DISABLE_Msk));
+        ses_control.predicted_failure = (0U != (byte & SCD_CMD_SAS_PRDFAIL_Msk));
+        ses_control.select = (0U != (byte & SCD_CMD_SAS_SELECT_Msk));
+
+        byte = ses_control_data[SCD_SES_BYTE1];
+        ses_control.request_rebuild_remap_aborted = (0U != (byte & SCD_CMD_SAS_RR_ABORT_Msk));
+        ses_control.request_rebuild_remap = (0U != (byte & SCD_CMD_SAS_RR_Msk));
+        ses_control.request_in_failed_array = (0U != (byte & SCD_CMD_SAS_IN_FAILED_ARRAY_Msk));
+        ses_control.request_in_critical_array = (0U != (byte & SCD_CMD_SAS_IN_CRIT_ARRAY_Msk));
+        ses_control.request_consistency_check = (0U != (byte & SCD_CMD_SAS_CONS_CHECK_Msk));
+        ses_control.request_hot_spare = (0U != (byte & SCD_CMD_SAS_HOT_SPARE_Msk));
+        ses_control.request_reserved_device = (0U != (byte & SCD_CMD_SAS_RSVD_DEVICE_Msk));
+        ses_control.request_ok = (0U != (byte & SCD_CMD_SAS_OK_Msk));
+
+        byte = ses_control_data[SCD_SES_BYTE2];
+        ses_control.request_identify = (0U != (byte & SCD_CMD_SAS_IDENT_Msk));
+        ses_control.request_remove = (0U != (byte & SCD_CMD_SAS_REMOVE_Msk));
+        ses_control.request_insert = (0U != (byte & SCD_CMD_SAS_INSERT_Msk));
+        ses_control.request_missing = (0U != (byte & SCD_CMD_SAS_MISSING_Msk));
+        ses_control.do_not_remove = (0U != (byte & SCD_CMD_SAS_DO_NOT_REMOVE_Msk));
+        ses_control.request_active = (0U != (byte & SCD_CMD_SAS_ACTIVE_Msk));
+
+        byte = ses_control_data[SCD_SES_BYTE3];
+        ses_control.enable_bypass_b = (0U != (byte & SCD_CMD_SAS_BYP_B_Msk));
+        ses_control.enable_bypass_a = (0U != (byte & SCD_CMD_SAS_BYP_A_Msk));
+        ses_control.device_off = (0U != (byte & SCD_CMD_SAS_DEVICE_OFF_Msk));
+        ses_control.request_fault = (0U != (byte & SCD_CMD_SAS_FAULT_REQUEST_Msk));
+
+        app_context.dfc_index = dfc_index;
+        app_context.ses_control = &ses_control;
+        app_context.ses_status = &ses_status;
+        result = app_callback(&app_context);
+
+        if (result)
+        {
+            ses_status_data[SCD_SES_BYTE0] = (ses_status.element_status_code << SCD_CMD_SAS_ELEM_STS_CODE_Pos) &
+                                             SCD_CMD_SAS_ELEM_STS_CODE_Msk;
+            ses_status_data[SCD_SES_BYTE0] |= (uint8_t)ses_status.swap << SCD_CMD_SAS_RESET_SWAP_Pos;
+            ses_status_data[SCD_SES_BYTE0] |= (uint8_t)ses_status.disabled << SCD_CMD_SAS_DISABLE_Pos;
+            ses_status_data[SCD_SES_BYTE0] |= (uint8_t)ses_status.predicted_failure << SCD_CMD_SAS_PRDFAIL_Pos;
+
+            ses_status_data[SCD_SES_BYTE1] = (uint8_t)ses_status.rebuild_remap_abort << SCD_CMD_SAS_RR_ABORT_Pos;
+            ses_status_data[SCD_SES_BYTE1] |= (uint8_t)ses_status.rebuild_remap << SCD_CMD_SAS_RR_Pos;
+            ses_status_data[SCD_SES_BYTE1] |= (uint8_t)ses_status.in_failed_array << SCD_CMD_SAS_IN_FAILED_ARRAY_Pos;
+            ses_status_data[SCD_SES_BYTE1] |= (uint8_t)ses_status.in_critical_array << SCD_CMD_SAS_IN_CRIT_ARRAY_Pos;
+            ses_status_data[SCD_SES_BYTE1] |= (uint8_t)ses_status.consistency_check << SCD_CMD_SAS_CONS_CHECK_Pos;
+            ses_status_data[SCD_SES_BYTE1] |= (uint8_t)ses_status.hot_spare << SCD_CMD_SAS_HOT_SPARE_Pos;
+            ses_status_data[SCD_SES_BYTE1] |= (uint8_t)ses_status.reserved_device << SCD_CMD_SAS_RSVD_DEVICE_Pos;
+            ses_status_data[SCD_SES_BYTE1] |= (uint8_t)ses_status.ok << SCD_CMD_SAS_OK_Pos;
+
+            ses_status_data[SCD_SES_BYTE2] = (uint8_t)ses_status.report << SCD_CMD_SAS_REPORT_Pos;
+            ses_status_data[SCD_SES_BYTE2] |= (uint8_t)ses_status.identify << SCD_CMD_SAS_IDENT_Pos;
+            ses_status_data[SCD_SES_BYTE2] |= (uint8_t)ses_status.rmv << SCD_CMD_SAS_REMOVE_Pos;
+            ses_status_data[SCD_SES_BYTE2] |= (uint8_t)ses_status.ready_to_insert << SCD_CMD_SAS_INSERT_Pos;
+            ses_status_data[SCD_SES_BYTE2] |= (uint8_t)ses_status.enclosure_bypassed_b << SCD_CMD_SAS_ENCL_BYP_B_Pos;
+            ses_status_data[SCD_SES_BYTE2] |= (uint8_t)ses_status.enclosure_bypassed_a << SCD_CMD_SAS_ENCL_BYP_A_Pos;
+            ses_status_data[SCD_SES_BYTE2] |= (uint8_t)ses_status.do_not_remove << SCD_CMD_SAS_DO_NOT_REMOVE_Pos;
+            ses_status_data[SCD_SES_BYTE2] |= (uint8_t)ses_status.app_client_bypassed_a << SCD_CMD_SAS_APP_BYP_A_Pos;
+
+            ses_status_data[SCD_SES_BYTE3] = (uint8_t)ses_status.device_bypassed_b << SCD_CMD_SAS_DEV_BYP_B_Pos;
+            ses_status_data[SCD_SES_BYTE3] |= (uint8_t)ses_status.device_bypassed_a << SCD_CMD_SAS_DEV_BYP_A_Pos;
+            ses_status_data[SCD_SES_BYTE3] |= (uint8_t)ses_status.bypassed_b << SCD_CMD_SAS_BYP_B_Pos;
+            ses_status_data[SCD_SES_BYTE3] |= (uint8_t)ses_status.bypassed_a << SCD_CMD_SAS_BYP_A_Pos;
+            ses_status_data[SCD_SES_BYTE3] |= (uint8_t)ses_status.device_off << SCD_CMD_SAS_DEVICE_OFF_Pos;
+            ses_status_data[SCD_SES_BYTE3] |= (uint8_t)ses_status.fault_requested << SCD_CMD_SAS_FAULT_REQUEST_Pos;
+            ses_status_data[SCD_SES_BYTE3] |= (uint8_t)ses_status.fault_sensed << SCD_CMD_SAS_FAULT_SENSED_Pos;
+            ses_status_data[SCD_SES_BYTE3] |= (uint8_t)ses_status.app_client_bypassed_b << SCD_CMD_SAS_APP_BYP_B_Pos;
+        }
+    }
+}
+
+
+#endif // MTB_UBM_SES_CB_ACTIVE

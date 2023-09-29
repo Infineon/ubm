@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * \file mtb_ubm_io.h
- * \version 0.5
+ * \version 1.0
  *
  * \brief
- * Provides the UBM middleware I/O functions.
+ * Provides functions for the UBM middleware I/O.
  *
  *******************************************************************************
  * (c) (2021-2023), Cypress Semiconductor Corporation (an Infineon company) or
@@ -47,27 +47,42 @@
 extern "C" {
 #endif
 
-/* Period for 100uS is 100, but time required for interrupt handling this time
- * is reducing, practically it was measured to require lower period value. */
+/* The period for 100uS is 100, but the time required for the interrupt to
+ * handle this time is reduced. Practically, the period measured requires a lower
+ * period value. */
 #define MTB_UBM_TIMER_PERIOD_100US              (85U)
-#define MTB_UBM_FREQUNCY_1M                     (1000000U)
+#define MTB_UBM_FREQUENCY_1M                    (1000000U)
 
 #define MTB_UBM_PRSNT_SHIFT                     (0U)
 #define MTB_UBM_IFDET_SHIFT                     (1U)
 #define MTB_UBM_IFDET2_SHIFT                    (2U)
 
-#define MTB_UBM_I2C_RESET_DELAY                 (10000U)
-#define MTB_UBM_FULL_RESET_DELAY                (50000U)
+#define MTB_UBM_I2C_RESET_DELAY                 (10U)
+#define MTB_UBM_FULL_RESET_DELAY                (50U)
 
-bool mtb_ubm_io_dfc_init(mtb_stc_ubm_controller_t* ctrl_context,
-                         const mtb_stc_ubm_dfc_signals_t* signals,
-                         const mtb_stc_ubm_routing_t* routing_info,
-                         const mtb_stc_ubm_backplane_cfg_t* config);
-bool mtb_ubm_io_hfc_init(mtb_stc_ubm_controller_t* ctrl_context,
-                         const mtb_stc_ubm_hfc_signals_t* signals,
-                         const mtb_stc_ubm_backplane_cfg_t* config);
-bool mtb_ubm_io_timer_init(mtb_stc_ubm_context_t* context);
+#define MTB_UBM_PCIE_TIMER_PERIOD               (10U)
+#define MTB_UBM_PCIE_TIMER_FREQUENCY            (10000U)
 
+/* The states of the PCIe reset signal */
+#define MTB_UBM_PCIE_RESET_FIELD_NOP            (0x00U)
+#define MTB_UBM_PCIE_RESET_FIELD_INIT           (0x01U)
+#define MTB_UBM_PCIE_RESET_FIELD_HOLD           (0x02U)
+
+/* Modes of the PCIe reset signal release */
+#define MTB_UBM_DFC_PERST_OVERRIDE_NO_OVERRIDE  (0x00U)
+#define MTB_UBM_DFC_PERST_OVERRIDE_MANAGED      (0x01U)
+#define MTB_UBM_DFC_PERST_OVERRIDE_AUTO         (0x02U)
+
+#define MTB_UBM_SIGNAL_TO_DISABLE_REFCLK_MUX    (!MTB_UBM_SIGNAL_TO_ENABLE_REFCLK_MUX)
+
+mtb_en_ubm_status_t mtb_ubm_io_dfc_init(mtb_stc_ubm_context_t* context,
+                                        uint32_t dfc_index,
+                                        const mtb_stc_ubm_dfc_signals_t* signals,
+                                        const mtb_stc_ubm_backplane_cfg_t* config);
+mtb_en_ubm_status_t mtb_ubm_io_hfc_init(mtb_stc_ubm_context_t* context,
+                                        uint32_t hfc_index,
+                                        const mtb_stc_ubm_hfc_signals_t* signals);
+mtb_en_ubm_status_t mtb_ubm_io_timer_init(mtb_stc_ubm_context_t* context);
 
 #ifdef __cplusplus
 }

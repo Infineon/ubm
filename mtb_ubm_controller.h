@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * \file mtb_ubm_controller.h
- * \version 0.5
+ * \version 1.0
  *
  * \brief
- * Provides the UBM controller common API declarations.
+ * Provides common API declarations for the UBM controller.
  *
  *******************************************************************************
  * (c) (2021-2023), Cypress Semiconductor Corporation (an Infineon company) or
@@ -47,10 +47,20 @@
 extern "C" {
 #endif
 
-mtb_ubm_cmd_t mtb_ubm_get_packet_command(const mtb_stc_ubm_controller_t* ctrl_context);
-void mtb_ubm_controller_handle_request(mtb_stc_ubm_context_t* ubm_context, mtb_stc_ubm_controller_t* ctrl_context);
-mtb_en_ubm_op_state_t mtb_ubm_get_op_state(const mtb_stc_ubm_controller_t* ctrl_context);
-void mtb_ubm_set_op_state(mtb_stc_ubm_controller_t* ctrl_context, mtb_en_ubm_op_state_t state);
+mtb_ubm_cmd_t mtb_ubm_get_packet_command(const mtb_stc_ubm_hfc_t* hfc_context);
+void mtb_ubm_controller_handle_request(mtb_stc_ubm_context_t* ubm_context,
+                                       mtb_stc_ubm_hfc_t* hfc_context);
+mtb_en_ubm_op_state_t mtb_ubm_get_op_state(const mtb_stc_ubm_context_t* ubm_context);
+void mtb_ubm_set_op_state(mtb_stc_ubm_context_t* ubm_context,
+                          mtb_en_ubm_op_state_t state);
+void mtb_ubm_update_change_count(const mtb_stc_ubm_context_t* ubm_context,
+                                 mtb_stc_ubm_controller_t* ctrl_context,
+                                 const mtb_stc_ubm_dfc_t* dfc_context,
+                                 mtb_en_ubm_change_count_source_t source);
+mtb_en_ubm_lc_sts_t mtb_ubm_process_pcie_reset_request(const mtb_stc_ubm_context_t* ubm_context,
+                                                       const mtb_stc_ubm_hfc_t* hfc_context,
+                                                       const mtb_stc_ubm_controller_t* ctrl_context,
+                                                       mtb_stc_ubm_dfc_t* dfc_context);
 
 #ifdef __cplusplus
 }

@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * \file mtb_ubm_fru.h
- * \version 0.5
+ * \version 1.0
  *
  * \brief
- * Provides the UBM middleware FRU layout and configuration structures
- *  declarations.
+ * Provides declarations for the UBM middleware FRU layout and configuration
+ * structures.
  *
  *******************************************************************************
  * (c) (2021-2023), Cypress Semiconductor Corporation (an Infineon company) or
@@ -75,37 +75,37 @@ extern "C" {
 #define MTB_UBM_FRU_CH_H2_LEN                                (1U)
 
 #define MTB_UBM_FRU_CH_H2_CHASIS_INFO_OFFSET_Pos             (0U)
-#define MTB_UBM_FRU_CH_H2_CHASIS_INFO_OFFSET_Msk             (0xFFu)
+#define MTB_UBM_FRU_CH_H2_CHASIS_INFO_OFFSET_Msk             (0xFFU)
 //------------------------------------------------------------------------------
 #define MTB_UBM_FRU_CH_H3_ADDR                               (3U)
 #define MTB_UBM_FRU_CH_H3_LEN                                (1U)
 
 #define MTB_UBM_FRU_CH_H3_BOARD_INFO_OFFSET_Pos              (0U)
-#define MTB_UBM_FRU_CH_H3_BOARD_INFO_OFFSET_Msk              (0xFFu)
+#define MTB_UBM_FRU_CH_H3_BOARD_INFO_OFFSET_Msk              (0xFFU)
 //------------------------------------------------------------------------------
 #define MTB_UBM_FRU_CH_H4_ADDR                               (4U)
 #define MTB_UBM_FRU_CH_H4_LEN                                (1U)
 
 #define MTB_UBM_FRU_CH_H4_PRODUCT_INFO_OFFSET_Pos            (0U)
-#define MTB_UBM_FRU_CH_H4_PRODUCT_INFO_OFFSET_Msk            (0xFFu)
+#define MTB_UBM_FRU_CH_H4_PRODUCT_INFO_OFFSET_Msk            (0xFFU)
 //------------------------------------------------------------------------------
 #define MTB_UBM_FRU_CH_H5_ADDR                               (5U)
 #define MTB_UBM_FRU_CH_H5_LEN                                (1U)
 
 #define MTB_UBM_FRU_CH_H5_MUTRECORD_OFFSET_Pos               (0U)
-#define MTB_UBM_FRU_CH_H5_MUTRECORD_OFFSET_Msk               (0xFFu)
+#define MTB_UBM_FRU_CH_H5_MUTRECORD_OFFSET_Msk               (0xFFU)
 //------------------------------------------------------------------------------
 #define MTB_UBM_FRU_CH_H6_ADDR                               (6U)
 #define MTB_UBM_FRU_CH_H6_LEN                                (1U)
 
 #define MTB_UBM_FRU_CH_H6_PAD_Pos                            (0U)
-#define MTB_UBM_FRU_CH_H6_PAD_Msk                            (0xFFu)
+#define MTB_UBM_FRU_CH_H6_PAD_Msk                            (0xFFU)
 //------------------------------------------------------------------------------
 #define MTB_UBM_FRU_CH_H7_ADDR                               (7U)
 #define MTB_UBM_FRU_CH_H7_LEN                                (1U)
 
 #define MTB_UBM_FRU_CH_H7_CHECKSUM_Pos                       (0U)
-#define MTB_UBM_FRU_CH_H7_CHECKSUM_Msk                       (0xFFu)
+#define MTB_UBM_FRU_CH_H7_CHECKSUM_Msk                       (0xFFU)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -270,7 +270,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 #define MTB_UBM_FRU_RI_D_ADDR                                (29U)
 #define MTB_UBM_FRU_RI_D_LEN                                 (7U)
-#define MTB_UBM_FRU_MAX_ROUTE_DESCRIPTORS                    (32u)
+#define MTB_UBM_FRU_MAX_ROUTE_DESCRIPTORS                    (32U)
 //------------------------------------------------------------------------------
 #define MTB_UBM_FRU_RI_D0_ADDR                               (0U)
 #define MTB_UBM_FRU_RI_D0_LEN                                (1U)
@@ -346,13 +346,24 @@ extern "C" {
 //------------------------------------------------------------------------------
 
 /** FRU Array size */
-#define MTB_UBM_FRU_SIZE                                     (256u)
+#define MTB_UBM_FRU_SIZE                                     (256U)
+/** FRU Array address */
+#define MTB_UBM_FRU_START_ADDRESS                            (0U)
+
+/** FRU Common Header Format Version */
+#define MTB_UBM_FRU_CH_FORMAT_VERSION                        (0x01U)
+/** FRU Common Header Format Version */
+#define MTB_UBM_FRU_CH_AREA_NOT_PRESENT                      (0x00U)
+/** FRU Common Header Format Version */
+#define MTB_UBM_FRU_CH_PADDING                               (0x00U)
 
 /** FRU Overview Area record type */
 #define MTB_UBM_FRU_OA_RECORD_TYPE                           (0xA0U)
 /** FRU Overview Area record format */
 #define MTB_UBM_FRU_OA_RECORD_FMT                            (0x02U)
-/** FRU Overview Area record lenght */
+/** FRU Overview Area record format */
+#define MTB_UBM_FRU_OA_EOL_VALUE                             (0x00U)
+/** FRU Overview Area record length */
 #define MTB_UBM_FRU_OA_RECORD_LENGTH                         (0x0BU)
 /** FRU Overview Area specification version */
 #define MTB_UBM_FRU_SPEC_VERSION                             (MTB_UBM_SPEC_VER)
@@ -375,7 +386,7 @@ extern "C" {
  * @{
  */
 
-/** No mux predent */
+/** No mux present */
 #define MTB_UBM_FRU_OA_2WIRE_ARRANGEMENT_NO_MUX               (0x00U)
 /** DFC 2Wire interface behind Mux */
 #define MTB_UBM_FRU_OA_2WIRE_ARRANGEMENT_DFC_MUX              (0x01U)
@@ -422,7 +433,7 @@ extern "C" {
 /** PCIe Reset field changes cause the Change Count field to increment */
 #define MTB_UBM_FRU_OA_F_PCIE_RES_INC                        (0x08U)
 
-/** CPRSNT Legacy Mode - behavior of the CPRSNT/CHANGE_DETECT# signal */
+/** CPRSNT Legacy Mode - the behavior of the CPRSNT/CHANGE_DETECT# signal */
 /** CHANGE_DETECT# interrupt operation */
 #define MTB_UBM_FRU_OA_F_CHANGE_DETECT                       (0x00U)
 /** CPRSNT# legacy operation */
@@ -474,24 +485,14 @@ extern "C" {
 
 /** \cond DO_NOT_DOCUMENT */
 
-uint8_t mtb_ubm_fru_calculate_checksum(const uint8_t* data_bytes, uint32_t data_length);
 
-void mtb_ubm_fru_handle_request(mtb_stc_ubm_context_t* ubm_context, mtb_stc_ubm_controller_t* ctrl_context);
-
-bool mtb_ubm_fru_get_ch_multirecord_offset(uint8_t *value, mtb_stc_ubm_context_t* ubm_context);
-
-void mtb_ubm_fru_init_common_header(uint8_t *ram_array);
-void mtb_ubm_fru_init_overview_area(const mtb_stc_ubm_backplane_cfg_t* config, uint8_t *ram_array);
-void mtb_ubm_fru_init_route_information_header(uint8_t routeNumber, uint8_t *ram_array);
-void mtb_ubm_fru_init_route_information_descriptor(uint8_t num_of_routes, const mtb_stc_ubm_routing_t *routing_info,
-                                                   uint8_t *ram_array);
-
-bool mtb_ubm_fru_get_oa_data_number_control_status_descriptors(uint8_t *value, mtb_stc_ubm_context_t* ubm_context);
-bool mtb_ubm_fru_get_ri_two_wire_address(uint8_t route, uint8_t *value, mtb_stc_ubm_context_t* ubm_context);
-bool mtb_ubm_fru_get_ri_domain(uint8_t route, uint8_t *value, mtb_stc_ubm_context_t* ubm_context);
-bool mtb_ubm_fru_get_ri_port_type(uint8_t route, uint8_t *value, mtb_stc_ubm_context_t* ubm_context);
-bool mtb_ubm_fru_get_ri_hfc_identifier(uint8_t route, uint8_t *value, mtb_stc_ubm_context_t* ubm_context);
-bool mtb_ubm_fru_get_oa_data_controller_features(uint16_t *value, mtb_stc_ubm_context_t* ubm_context);
+void mtb_ubm_fru_handle_request(mtb_stc_ubm_context_t* ubm_context, mtb_stc_ubm_hfc_t* hfc_context);
+void mtb_ubm_fru_init_common_header(uint8_t* ram_array);
+void mtb_ubm_fru_init_overview_area(const mtb_stc_ubm_backplane_cfg_t* config, uint8_t* ram_array);
+void mtb_ubm_fru_init_ri_header(uint8_t routes_num, uint8_t* ram_array);
+void mtb_ubm_fru_init_ri_descriptor(uint32_t num_of_routes,
+                                    const mtb_stc_ubm_routing_t* routing_info,
+                                    uint8_t* ram_array);
 
 /** \endcond */
 

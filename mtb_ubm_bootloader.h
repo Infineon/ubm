@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * \file mtb_ubm_bootloader.h
- * \version 0.5
+ * \version 1.0
  *
  * \brief
- * Provides the UBM middleware bootloader API and configuration structures
- *  declarations.
+ * Provides declarations for the UBM middleware bootloader API and
+ * configuration structures.
  *
  *******************************************************************************
  * (c) (2021-2023), Cypress Semiconductor Corporation (an Infineon company) or
@@ -44,7 +44,7 @@
 
 #include "mtb_ubm_config.h"
 
-#if(MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED)
+#if (MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED)
 #include <string.h>
 #include <stdint.h>
 #include "cyhal_flash.h"
@@ -54,13 +54,13 @@
 extern "C" {
 #endif
 
-bool mtb_ubm_init_flash_geometry(mtb_stc_ubm_context_t* context);
+mtb_en_ubm_status_t mtb_ubm_init_flash_geometry(mtb_stc_ubm_context_t* context);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED */
+#endif /* (MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED) */
 
-#endif /* ifndef MTB_UBM_BOOTLOADER_H */
+#endif /* MTB_UBM_BOOTLOADER_H */
 /*END FILE*/

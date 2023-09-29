@@ -21,24 +21,26 @@ var group__group__ubm__fru__data__structures =
       [ "enable_bit_location", "group__group__ubm__fru__data__structures.html#a6450d6a6926358e88825d41463631a81", null ],
       [ "mux_type", "group__group__ubm__fru__data__structures.html#ad760375a636dfc3dab538e98a3d5f249", null ]
     ] ],
+    [ "mtb_stc_ubm_drive_types_t", "group__group__ubm__fru__data__structures.html#structmtb__stc__ubm__drive__types__t", [
+      [ "sff_ta_1001", "group__group__ubm__fru__data__structures.html#ac62b2401ad14e81ad99d6387c6661089", null ],
+      [ "gen_z", "group__group__ubm__fru__data__structures.html#ab26630b10f744047f32bfa4b9c1853c9", null ],
+      [ "sas_sata", "group__group__ubm__fru__data__structures.html#a5b9447f83c872cf7a77438637d12b85f", null ],
+      [ "quad_pcie", "group__group__ubm__fru__data__structures.html#a302dc4466fdf2bf2bb63024fd1544993", null ],
+      [ "dfc_empty", "group__group__ubm__fru__data__structures.html#a0f07e9821e69374a3c43d390b46c4144", null ]
+    ] ],
     [ "mtb_stc_ubm_routing_t", "group__group__ubm__fru__data__structures.html#structmtb__stc__ubm__routing__t", [
-      [ "drive_link_width", "group__group__ubm__fru__data__structures.html#a41617b740c6b93a79a5dce045b2da3db", null ],
+      [ "ubm_ctrl_type", "group__group__ubm__fru__data__structures.html#a134993ac0552773f5a09ecfc28c62a57", null ],
+      [ "ubm_ctrl_slave_addr", "group__group__ubm__fru__data__structures.html#aeab3c7e9c2b7c71731c991a01868c786", null ],
       [ "drive_connector_idx", "group__group__ubm__fru__data__structures.html#a110e158c42f5b6dc982bb967275314a6", null ],
+      [ "drive_types_supported", "group__group__ubm__fru__data__structures.html#a01e2de258639c2fe3f232e2afed3db55", null ],
+      [ "drive_link_width", "group__group__ubm__fru__data__structures.html#a41617b740c6b93a79a5dce045b2da3db", null ],
       [ "port_type", "group__group__ubm__fru__data__structures.html#affcdba5bf072f91d514253d33dd8b9aa", null ],
       [ "domain", "group__group__ubm__fru__data__structures.html#a8981c8e01e661544634f33abe456efce", null ],
+      [ "max_sata_line_rate", "group__group__ubm__fru__data__structures.html#acd95f7a6629245c7fdd72c090bd38e2a", null ],
+      [ "max_pcie_line_rate", "group__group__ubm__fru__data__structures.html#ad34e7bf586cc2f59c6d13b4e9d48791e", null ],
+      [ "max_sas_line_rate", "group__group__ubm__fru__data__structures.html#ae5def2fd27ff07c6316f575f772e2e37", null ],
       [ "hfc_starting_phy_lane", "group__group__ubm__fru__data__structures.html#aa8bef1f0cfa57b99968545e8544a2173", null ],
       [ "hfc_identifier", "group__group__ubm__fru__data__structures.html#aee636787e676c23ea5c1748c38992e54", null ],
-      [ "ubm_ctrl_slave_addr", "group__group__ubm__fru__data__structures.html#aeab3c7e9c2b7c71731c991a01868c786", null ],
-      [ "ubm_ctrl_type", "group__group__ubm__fru__data__structures.html#a134993ac0552773f5a09ecfc28c62a57", null ],
-      [ "dfc_status_and_control", "group__group__ubm__fru__data__structures.html#a785a66095a1e9612106981d3e3785a57", null ],
-      [ "sff_ta_1001_support", "group__group__ubm__fru__data__structures.html#a29102ccfe013f757e8ab184f0b02a7d4", null ],
-      [ "gen_z_support", "group__group__ubm__fru__data__structures.html#a8adf017eb828df3c26d211abf8524777", null ],
-      [ "sas_sata_support", "group__group__ubm__fru__data__structures.html#a9251e3fd290e307e35e98a2b32c555f3", null ],
-      [ "quad_pcie_support", "group__group__ubm__fru__data__structures.html#ad422cb1267caa8e225024a4ba9da5469", null ],
-      [ "dfc_empty", "group__group__ubm__fru__data__structures.html#a6b869fc67923c3d9ffeaf4340e63b760", null ],
-      [ "max_sata_rate", "group__group__ubm__fru__data__structures.html#a39aaf8b0ebeb64c5a0a7f30cb612756e", null ],
-      [ "max_pcie_rate", "group__group__ubm__fru__data__structures.html#a3c6f6444cda31ed4a358e8b7d35f5795", null ],
-      [ "max_sas_rate", "group__group__ubm__fru__data__structures.html#adf2b67aaaaa01908396d2f85fc1c140c", null ],
       [ "slot_offset", "group__group__ubm__fru__data__structures.html#a8b208e4289f55f64f18c127e6e030683", null ]
     ] ]
 ];

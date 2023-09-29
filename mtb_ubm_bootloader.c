@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * \file mtb_ubm_bootloader.c
- * \version 0.5
+ * \version 1.0
  *
  * \brief
- * Provides the UBM middleware bootloader API implementation.
+ * Provides API implementation for the UBM middleware bootloader.
  *
  *******************************************************************************
  * (c) (2021-2023), Cypress Semiconductor Corporation (an Infineon company) or
@@ -40,43 +40,51 @@
 
 #include "mtb_ubm_bootloader.h"
 
-#if(MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED)
- /*******************************************************************************
- * Function Name: mtb_ubm_init_flash_geometry
- ****************************************************************************//**
- *
- *  Initializes the UBM flash area to Update mode.
- *
- * \param context
- *  Pointer to the context structure.
- *
- * \return
- *  "true" if initialization succeeds, and "false" if it fails.
- *
- *******************************************************************************/
-bool mtb_ubm_init_flash_geometry(mtb_stc_ubm_context_t* context)
+#if (MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED)
+/*******************************************************************************
+* Function Name: mtb_ubm_init_flash_geometry
+****************************************************************************//**
+*
+*  Initializes the UBM flash area to Update mode.
+*
+* \param context
+*  The pointer to the context structure.
+*
+* \return
+*  See \ref mtb_en_ubm_status_t.
+*
+*******************************************************************************/
+mtb_en_ubm_status_t mtb_ubm_init_flash_geometry(mtb_stc_ubm_context_t* context)
 {
-    bool status = false;
+    mtb_en_ubm_status_t status = MTB_UBM_STATUS_SUCCESS;
 
-    /* Calculate address of start upgrade slot */
-    uint32_t start_addr = MTB_UBM_UPGRADE_AREA_START + MTB_UBM_UPGRADE_AREA_SIZE;
-
-    /* Check generated define */
-    if ((start_addr != 0U) && (MTB_UBM_UPGRADE_AREA_SIZE != 0U) && \
-                              ((start_addr % CY_FLASH_SIZEOF_ROW) == 0))
+    /* Check the configured macros */
+    if ((0U == MTB_UBM_UPGRADE_AREA_SIZE) || (0U != (MTB_UBM_UPGRADE_IMAGE_START_ADDRESS % CY_FLASH_SIZEOF_ROW)))
     {
-        context->flash_layout.addr_start_upgrade_area = start_addr;
-        context->flash_layout.size_upgrade_area = MTB_UBM_UPGRADE_AREA_SIZE;
-        
-        status = true;
+        CY_MISRA_DEVIATE_LINE('MISRA C-2012 Rule 14.3', 'Validating invariant expression, as it is defined on the application level.');
+        status = MTB_UBM_STATUS_BOOTLOADER_START_ADDR_ERR;
     }
 
-    (void)cyhal_flash_init(&context->flash_layout.flash_obj);
+    if (MTB_UBM_STATUS_SUCCESS == status)
+    {
+        cy_rslt_t result;
 
-    context->flash_layout.offset_row_buffer = 0U;
+        result = cyhal_flash_init(&context->flash_layout.flash_obj);
+
+        if (CY_RSLT_SUCCESS == result)
+        {
+            context->flash_layout.offset_row_buffer = 0U;
+        }
+        else
+        {
+            status = MTB_UBM_STATUS_BOOTLOADER_FLASH_INIT_ERR;
+        }
+    }
 
     return status;
 }
-#endif /* MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED */
+
+
+#endif /* (MTB_UBM_UPDATE_MODE_CAPABILITIES != MTB_UBM_UPDATE_NOT_SUPPORTED) */
 
 /*END FILE*/

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['write_5fbuffer',['write_buffer',['../structmtb__stc__ubm__i2c__t.html#a91db48dbdaf8a38cffb4456b40238a76',1,'mtb_stc_ubm_i2c_t']]],
-  ['write_5fchecksum_5fchecking',['write_checksum_checking',['../group__group__ubm__fru__data__structures.html#ac6fb392e83854e2c4afe4da9c63cd545',1,'mtb_stc_ubm_features_t']]],
-  ['write_5fdata_5flength',['write_data_length',['../structmtb__stc__ubm__i2c__t.html#a23c718cffd176bdf5b2c55d368048b42',1,'mtb_stc_ubm_i2c_t']]]
+  ['vendor_5fspecific',['vendor_specific',['../structmtb__stc__ubm__siv__t.html#a126e2a1b5a2d84c248546430d8bc268c',1,'mtb_stc_ubm_siv_t']]],
+  ['vendor_5fspecific_5fbyte_5f0',['vendor_specific_byte_0',['../structmtb__stc__ubm__status__and__control__descriptor__t.html#aa9110babbfbe1bb7d36b67e8ca4fc179',1,'mtb_stc_ubm_status_and_control_descriptor_t']]],
+  ['vendor_5fspecific_5fbyte_5f1',['vendor_specific_byte_1',['../structmtb__stc__ubm__status__and__control__descriptor__t.html#abc2d7883fcac1fd634434a5b508b81f0',1,'mtb_stc_ubm_status_and_control_descriptor_t']]]
 ];
